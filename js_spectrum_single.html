@@ -64,9 +64,28 @@
             box-shadow: none;
             background: #000;
         }
+        .monitor-frame.is-fullscreen {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+            box-shadow: none;
+            background: #000;
+        }
         .monitor-frame:fullscreen::backdrop { background: #000; }
         .monitor-frame:-webkit-full-screen .canvas-wrapper,
         .monitor-frame:fullscreen .canvas-wrapper {
+            border-radius: 0;
+            margin: 0;
+        }
+        .monitor-frame.is-fullscreen .canvas-wrapper {
             border-radius: 0;
             margin: 0;
         }
@@ -83,20 +102,65 @@
 
         .controls-wrap {
             position: relative;
-            margin-top: 25px;
+            margin-top: 24px;
+            width: min(980px, calc(100vw - 28px));
         }
         .controls-panel {
-            margin-top: 0; background: var(--panel-color); padding: 15px 25px; border-radius: 50px;
-            display: flex; gap: 15px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid #333;
+            margin-top: 0;
+            background: linear-gradient(180deg, #1e1e1e 0%, #171717 100%);
+            padding: 12px;
+            border-radius: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: stretch;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+            border: 1px solid #333;
+        }
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #2f2f2f;
+        }
+        .control-group.core { flex: 1 1 540px; }
+        .control-group.display { flex: 1 1 320px; }
+        .control-group.meta { flex: 0 1 auto; }
+        @media (max-width: 760px) {
+            .controls-wrap { width: min(620px, calc(100vw - 20px)); }
+            .controls-panel { padding: 10px; gap: 8px; }
+            .control-group { width: 100%; justify-content: flex-start; }
         }
         .btn {
-            background: #333; color: #fff; border: none; padding: 10px 20px; border-radius: 20px;
-            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
-            display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+            background: #2b2f33;
+            color: #f1f1f1;
+            border: 1px solid #444b52;
+            padding: 9px 16px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: none;
+            letter-spacing: 0.2px;
+            min-height: 38px;
         }
-        .btn:hover:not(:disabled) { background: #444; transform: translateY(-1px); }
+        .btn:hover:not(:disabled) { background: #353b41; transform: translateY(-1px); border-color: #59616a; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn.primary { background: var(--accent-red); color: white; }
+        .btn.primary { background: linear-gradient(135deg, #9b1f1f, #d00000); border-color: #e44747; color: #fff; }
+        .btn.accent { background: linear-gradient(135deg, #5d4200, #9a6f00); border-color: #d0a03a; color: #fff; }
+        .btn.view { background: linear-gradient(135deg, #004a61, #006f92); border-color: #00a2d1; color: #fff; }
+        .btn.toggle-active { box-shadow: 0 0 0 2px rgba(0, 200, 255, 0.25); border-color: #66d9ff; }
+        .btn.meta { background: #262730; border-color: #4d4f67; }
         
         input[type="file"] { display: none; }
         .samples-menu {
@@ -181,6 +245,73 @@
         .samples-close:hover { background: #343434; }
         .status-bar { margin-top: 15px; font-family: monospace; font-size: 12px; color: #666; }
         .shortcut-badge { background: #333; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 11px; border: 1px solid #444; color: #ccc; }
+        .about-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .about-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .about-card {
+            width: min(760px, 100%);
+            max-height: min(86vh, 800px);
+            overflow: auto;
+            border-radius: 14px;
+            border: 1px solid #3a3a3a;
+            background: linear-gradient(180deg, #141414 0%, #0f0f0f 100%);
+            box-shadow: 0 20px 42px rgba(0, 0, 0, 0.65);
+            padding: 18px 20px 16px 20px;
+            line-height: 1.55;
+        }
+        .about-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            color: #f2f2f2;
+        }
+        .about-accent {
+            height: 2px;
+            margin: 10px 0 12px 0;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #d00000, #d7d700, #00d700, #00d7d7);
+        }
+        .about-card p {
+            margin: 10px 0;
+            color: #d1d1d1;
+            font-size: 14px;
+        }
+        .about-card a {
+            color: #7ee9ff;
+        }
+        .about-card a:hover {
+            color: #b8f4ff;
+        }
+        .about-close {
+            margin-top: 6px;
+            border: 1px solid #4a4a4a;
+            background: #282828;
+            color: #efefef;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .about-close:hover { background: #343434; }
     </style>
 
     <script> var module = {}; </script>
@@ -3598,13 +3729,21 @@ let cycle_counts_dd = [
 
     <div class="controls-wrap">
         <div class="controls-panel">
-            <button class="btn primary" id="btnAudio" onclick="enableAudio()">Start Audio</button>
-            <label class="btn">Load ROM<input type="file" id="romFile"></label>
-            <label class="btn">Load Tape<input type="file" id="tapFile" disabled accept=".tap,.TAP"></label>
-            <button id="btnSamples" class="btn" disabled aria-expanded="false">SAMPLES</button>
-            <button id="btnReset" class="btn" disabled>Reset</button>
-            <button id="btnFullscreen" class="btn" onclick="toggleFullscreen()">Fullscreen</button>
-            <button class="btn" onclick="toggleKeyboard()"><span class="shortcut-badge">F1</span> Map</button>
+            <div class="control-group core">
+                <label class="btn primary">Load ROM<input type="file" id="romFile"></label>
+                <button class="btn accent" id="btnAudio" type="button" onclick="enableAudio()">Start Audio</button>
+                <label class="btn">Load Tape<input type="file" id="tapFile" disabled accept=".tap,.TAP"></label>
+                <button id="btnSamples" class="btn" type="button" disabled aria-expanded="false">Samples</button>
+                <button id="btnReset" class="btn" type="button" disabled>Reset</button>
+            </div>
+            <div class="control-group display">
+                <button id="btnLargeView" class="btn view" type="button"></button>
+                <button id="btnFullscreen" class="btn view" type="button" onclick="toggleFullscreen()">Fullscreen</button>
+                <button class="btn" type="button" onclick="toggleKeyboard()"><span class="shortcut-badge">F1</span> Keyboard Map</button>
+            </div>
+            <div class="control-group meta">
+                <button id="btnAbout" class="btn meta" type="button">About</button>
+            </div>
         </div>
         <div id="samplesMenu" class="samples-menu" aria-hidden="true">
             <div class="samples-menu-title">Tape Samples</div>
@@ -3620,6 +3759,27 @@ let cycle_counts_dd = [
     
     <div style="margin-top:15px; font-size: 12px; color: #555;">
         PC <b>Ctrl</b> = Caps Shift &nbsp;|&nbsp; PC <b>Shift</b> = Symbol Shift
+    </div>
+    <div id="aboutModal" class="about-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+        <div class="about-card">
+            <h2 id="aboutTitle" class="about-title">About This Emulator</h2>
+            <div class="about-accent"></div>
+            <p><b>Author:</b> Luis Cunha, 2026.</p>
+            <p>This project is distributed under the <b>MIT License</b>.</p>
+            <p><b>Z80 microprocessor emulator core (`Z80.js`):</b> Copyright (c) <b>Molly Howell</b>.</p>
+            <p>
+                This emulator is dedicated to <b>Pedro Gimeno</b>, who first showed me the Turing machine principle in action on the day I saw
+                a fully functional ZX Spectrum replica on my PC-AT display. The 286 could only run it at about 50% speed, but it felt magical.
+                Pioneers like Pedro are often not recognized enough, and I want to openly manifest my respect and gratitude for his work.
+            </p>
+            <p>
+                For those who want to know more:
+                <a href="https://www.youtube.com/watch?v=zzWyqmLdeS8" target="_blank" rel="noopener noreferrer">
+                    https://www.youtube.com/watch?v=zzWyqmLdeS8
+                </a>
+            </p>
+            <button id="btnAboutClose" class="about-close" type="button">Close</button>
+        </div>
     </div>
 
 <script>
@@ -3681,7 +3841,9 @@ function enableAudio() {
         audioGain.gain.value = 0.10; // Lower volume for comfort
         audioGain.connect(audioCtx.destination);
         nextAudioTime = audioCtx.currentTime;
-        document.getElementById('btnAudio').style.display = 'none';
+        const audioBtn = document.getElementById('btnAudio');
+        audioBtn.disabled = true;
+        audioBtn.textContent = 'Audio Enabled';
         log("Audio Enabled. Ready.", 'success');
     } else if (audioCtx.state === 'suspended') {
         audioCtx.resume();
@@ -3726,18 +3888,25 @@ const keyboard = { 0xFEFE: 0x1F, 0xFDFE: 0x1F, 0xFBFE: 0x1F, 0xF7FE: 0x1F, 0xEFF
 const SCREEN_WIDTH = 256;
 const SCREEN_HEIGHT = 192;
 const DEFAULT_SCREEN_SCALE = 2;
+const WINDOWED_WIDTH_MARGIN = 60;
+const WINDOWED_HEIGHT_MARGIN = 320;
 const canvas = document.getElementById('screen');
 const ctx = canvas.getContext('2d');
 const imgData = ctx.createImageData(SCREEN_WIDTH, SCREEN_HEIGHT);
 const pixels = new Uint32Array(imgData.data.buffer);
 const monitor = document.getElementById('monitor');
 const container = document.getElementById('container');
+const btnLargeView = document.getElementById('btnLargeView');
 const btnFullscreen = document.getElementById('btnFullscreen');
 const btnSamples = document.getElementById('btnSamples');
 const samplesMenu = document.getElementById('samplesMenu');
 const sampleSelect = document.getElementById('sampleSelect');
 const btnSamplesClose = document.getElementById('btnSamplesClose');
+const btnAbout = document.getElementById('btnAbout');
+const aboutModal = document.getElementById('aboutModal');
+const btnAboutClose = document.getElementById('btnAboutClose');
 let sampleCatalog = [];
+let displayMode = 'default';
 
 function getFullscreenElement() {
     return document.fullscreenElement || document.webkitFullscreenElement;
@@ -3748,6 +3917,46 @@ function setDisplayScale(scale) {
     container.style.height = `${SCREEN_HEIGHT * scale}px`;
 }
 
+function getMaxWindowedScale() {
+    const targetWidth = Math.max(SCREEN_WIDTH, (window.innerWidth || SCREEN_WIDTH) - WINDOWED_WIDTH_MARGIN);
+    const targetHeight = Math.max(SCREEN_HEIGHT, (window.innerHeight || SCREEN_HEIGHT) - WINDOWED_HEIGHT_MARGIN);
+    const maxScale = Math.floor(Math.min(targetWidth / SCREEN_WIDTH, targetHeight / SCREEN_HEIGHT));
+    return Math.max(1, maxScale);
+}
+
+function getLargeWindowedScale() {
+    const maxScale = getMaxWindowedScale();
+    if (maxScale <= DEFAULT_SCREEN_SCALE) return DEFAULT_SCREEN_SCALE;
+    const midpointScale = Math.floor((DEFAULT_SCREEN_SCALE + maxScale) / 2);
+    return Math.max(DEFAULT_SCREEN_SCALE + 1, midpointScale);
+}
+
+function updateLargeViewButton() {
+    const isLargeMode = displayMode === 'large';
+    btnLargeView.classList.toggle('toggle-active', isLargeMode);
+    btnLargeView.innerHTML = `<span class="shortcut-badge">F3</span> ${isLargeMode ? 'Normal View' : 'Large View'}`;
+}
+
+function updateLargeViewButtonState(isFullscreenActive) {
+    if (isFullscreenActive) {
+        btnLargeView.disabled = true;
+        btnLargeView.classList.remove('toggle-active');
+        btnLargeView.innerHTML = '<span class="shortcut-badge">F3</span> Large View';
+        return;
+    }
+
+    btnLargeView.disabled = false;
+    updateLargeViewButton();
+}
+
+function toggleLargeView() {
+    if (getFullscreenElement() === monitor) return;
+    displayMode = (displayMode === 'large') ? 'default' : 'large';
+    updateLargeViewButton();
+    syncDisplayScale();
+    container.focus();
+}
+
 function syncDisplayScale() {
     if (getFullscreenElement() === monitor) {
         const targetWidth = monitor.clientWidth || window.innerWidth;
@@ -3755,7 +3964,8 @@ function syncDisplayScale() {
         const maxScale = Math.floor(Math.min(targetWidth / SCREEN_WIDTH, targetHeight / SCREEN_HEIGHT));
         setDisplayScale(Math.max(1, maxScale));
     } else {
-        setDisplayScale(DEFAULT_SCREEN_SCALE);
+        const nextScale = (displayMode === 'large') ? getLargeWindowedScale() : DEFAULT_SCREEN_SCALE;
+        setDisplayScale(nextScale);
     }
 }
 
@@ -3777,6 +3987,17 @@ function toggleKeyboard() {
     const overlay = document.getElementById('keyboardOverlay');
     overlay.classList.toggle('active');
     if (!overlay.classList.contains('active')) container.focus();
+}
+
+function openAbout() {
+    aboutModal.classList.add('active');
+    aboutModal.setAttribute('aria-hidden', 'false');
+}
+
+function closeAbout() {
+    aboutModal.classList.remove('active');
+    aboutModal.setAttribute('aria-hidden', 'true');
+    container.focus();
 }
 
 function log(msg, type) {
@@ -4097,9 +4318,10 @@ function releaseAllKeys() {
 }
 
 document.addEventListener('keydown', (e) => {
-    if (samplesMenu.classList.contains('active')) return;
+    if (samplesMenu.classList.contains('active') || aboutModal.classList.contains('active')) return;
     if (e.key === 'F1') { e.preventDefault(); toggleKeyboard(); return; }
     if (e.key === 'F2') { e.preventDefault(); toggleFullscreen(); return; }
+    if (e.key === 'F3') { e.preventDefault(); toggleLargeView(); return; }
     if (!isRunning) return;
     let k = resolveSpectrumKey(e);
     if (k) { keyboard[k[0]] &= ~k[1]; e.preventDefault(); }
@@ -4130,23 +4352,26 @@ document.getElementById('tapFile').addEventListener('change', (e) => {
     r.onload = (ev) => { setTapeBuffer(ev.target.result); };
     r.readAsArrayBuffer(file);
 });
-document.addEventListener('fullscreenchange', () => {
+function handleFullscreenStateChanged() {
     const active = getFullscreenElement() === monitor;
+    monitor.classList.toggle('is-fullscreen', active);
     btnFullscreen.innerHTML = active ? '<span class="shortcut-badge">F2</span> Windowed' : '<span class="shortcut-badge">F2</span> Fullscreen';
+    updateLargeViewButtonState(active);
     syncDisplayScale();
     container.focus();
-});
-document.addEventListener('webkitfullscreenchange', () => {
-    const active = getFullscreenElement() === monitor;
-    btnFullscreen.innerHTML = active ? '<span class="shortcut-badge">F2</span> Windowed' : '<span class="shortcut-badge">F2</span> Fullscreen';
-    syncDisplayScale();
-    container.focus();
-});
+}
+document.addEventListener('fullscreenchange', handleFullscreenStateChanged);
+document.addEventListener('webkitfullscreenchange', handleFullscreenStateChanged);
 window.addEventListener('resize', syncDisplayScale);
+monitor.classList.remove('is-fullscreen');
 btnFullscreen.innerHTML = '<span class="shortcut-badge">F2</span> Fullscreen';
+updateLargeViewButtonState(false);
 syncDisplayScale();
 document.getElementById('btnReset').addEventListener('click', resetSystem);
 loadEmbeddedRom();
+btnLargeView.addEventListener('click', () => {
+    toggleLargeView();
+});
 btnSamples.addEventListener('click', (e) => {
     e.stopPropagation();
     toggleSamplesMenu();
@@ -4155,12 +4380,24 @@ btnSamplesClose.addEventListener('click', () => {
     closeSamplesMenu();
     container.focus();
 });
+btnAbout.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openAbout();
+});
+btnAboutClose.addEventListener('click', closeAbout);
+aboutModal.addEventListener('click', (e) => {
+    if (e.target === aboutModal) closeAbout();
+});
 sampleSelect.addEventListener('change', handleSampleSelection);
 samplesMenu.addEventListener('click', (e) => e.stopPropagation());
 document.addEventListener('click', () => {
     if (samplesMenu.classList.contains('active')) closeSamplesMenu();
 });
 document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && aboutModal.classList.contains('active')) {
+        closeAbout();
+        return;
+    }
     if (e.key === 'Escape' && samplesMenu.classList.contains('active')) {
         closeSamplesMenu();
         container.focus();
